@@ -14,7 +14,7 @@
         creates: /etc/yum.repos.d/zabbix.repo
 
     - name: Modify php version
-      shell: dnf module switch-to php:7.4
+      shell: dnf module switch-to php:7.4 -y
 
     - name: Install required packages
       ansible.builtin.dnf:
