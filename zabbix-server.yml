@@ -100,31 +100,57 @@
         line: AllowUnsupportedDBVersions=1
         state: present
 
+    - name: Copy configuration file zabbix.conf.php to /etc/zabbix/web/
+      copy:
+        src: /usr/share/zabbix/conf/zabbix.conf.php.example
+        dest: /etc/zabbix/web/zabbix.conf.php
+
+    - name: Modify DB in zabbix.conf.php
+      lineinfile:
+        path: /etc/zabbix/web/zabbix.conf.php
+        regexp: 'DATABASE'
+        line: '$DB[''DATABASE'']                 = ''zabbixdb'';'
+        state: present
+
+    - name: Modify User in zabbix.conf.php
+      lineinfile:
+        path: /etc/zabbix/web/zabbix.conf.php
+        regexp: 'USER'
+        line: '$DB[''USER'']                 = ''zabuser'';'
+        state: present
+
+    - name: Modify Password in zabbix.conf.php
+      lineinfile:
+        path: /etc/zabbix/web/zabbix.conf.php
+        regexp: 'PASSWORD'
+        line: '$DB[''PASSWORD'']                 = ''zabpass'';'
+        state: present
+
     - name: Start and enable Zabbix Server service
       ansible.builtin.systemd:
         name: zabbix-server
-        state: started
+        state: restarted
         enabled: yes
-        daemon_reload: no
+        daemon_reload: yes
 
     - name: Start and enable Zabbix Agent service
       ansible.builtin.systemd:
         name: zabbix-agent
-        state: started
+        state: restarted
         enabled: yes
-        daemon_reload: no
+        daemon_reload: yes
 
     - name: Start and enable mysql service
       ansible.builtin.systemd:
         name: httpd
-        state: started
+        state: restarted
         enabled: yes
-        daemon_reload: no
+        daemon_reload: yes
 
     - name: Start and enable php-fpm service
       ansible.builtin.systemd:
         name: php-fpm
-        state: started
+        state: restarted
         enabled: yes
-        daemon_reload: no
+        daemon_reload: yes
 
