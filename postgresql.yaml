@@ -1,0 +1,40 @@
+---
+- hosts: localhost
+  become: yes
+  vars:
+    system_user: 'ec2-user'
+    ansible_python_interpreter: '/usr/bin/python3'
+
+  pre_tasks:
+    - name: "Install packages"
+      dnf: "name={{ item }} state=present"
+      with_items:
+        - postgresql
+        - postgresql-server
+        - python3-psycopg2
+
+  tasks:
+    - name: "Find out if PostgreSQL is initialized"
+      ansible.builtin.stat:
+        path: "/var/lib/pgsql/data/pg_hba.conf"
+      register: postgres_data
+
+    - name: "Initialize PostgreSQL"
+      shell: "postgresql-setup initdb"
+      when: not postgres_data.stat.exists
+ 
+    - name: "Start and enable services"
+      service: "name={{ item }} state=started enabled=yes"
+      with_items:
+        - postgresql
+
+    - name: Create a new database with name "acme"
+      become: true
+      become_user: postgres
+      postgresql_db:
+        name: acme
+  
+  handlers:
+    - name: restart postgres
+      service: name=postgresql state=restarted
+
