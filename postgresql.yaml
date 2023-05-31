@@ -11,13 +11,13 @@
       with_items:
         - postgresql
         - postgresql-server
-        - python3-psycopg2
+        - python3.11-psycopg2
 
   tasks:
-    - name: Install collection community.postgresql
-      community.general.ansible_galaxy_install:
-      type: collection
-      name: community.postgresql
+#    - name: Install collection community.postgresql
+#      community.general.ansible_galaxy_install:
+#      type: collection
+#      name: community.postgresql
       
     - name: "Find out if PostgreSQL is initialized"
       ansible.builtin.stat:
