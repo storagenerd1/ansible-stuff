@@ -1,0 +1,31 @@
+---
+- hosts: localhost
+  become: yes
+  tasks:
+
+    - name: Install required packages
+      ansible.builtin.dnf:
+        name:
+          - 'fail2ban'
+
+    - name: Add sshd jail
+      ansible.builtin.copy:
+        dest: /etc/fail2ban/jail.d/sshd.local
+        content: |
+          [sshd]
+          enabled = true
+          filter = sshd
+          #logpath = /var/log/secure
+          backend = systemd
+
+          # Override the default global configuration
+          # for specific jail sshd
+          bantime = 1d
+          maxretry = 3
+
+    - name: Start and enable fail2ban service
+      ansible.builtin.systemd:
+        name: fail2ban
+        state: started
+        enabled: yes
+        daemon_reload: no
