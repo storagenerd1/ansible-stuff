@@ -1,0 +1,28 @@
+---
+ - hosts: localhost
+   become: true
+   tasks:
+
+   - name: Add automation user
+     user:
+       name: robert
+
+   - name: Add user to sudoers
+     copy:
+       dest: "/etc/sudoers.d/robert"
+       content: "robert  ALL=(ALL)  NOPASSWD: ALL"
+
+   - name: Create .ssh directory
+     file:
+       path: /home/robert/.ssh
+       state: directory
+       owner: robert
+       group: robert
+
+   - name: Add public key to authorized_keys
+     copy:
+       dest: "/home/robert/.ssh/authorized_keys"
+       content: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINBtsjmTHNENtxnr1RGf4UQNDMblgpXkNMMyHmxzBHs5 robert@rockytwo.soeting.net"
+       owner: robert
+       group: robert
+       mode: '0600'
